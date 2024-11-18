@@ -1,28 +1,26 @@
 from rest_framework import serializers
-from apps.Modulo_Citas.Citas.models import Citas, DetalleCitas
 from apps.Catalogos.Pacientes.models import Pacientes
-from apps.Modulo_Examen.Examen.models import Examen
-from apps.Modulo_Medicamento.Medicamento.models import Medicamento
-from apps.Catalogos.Medicos.models import Medicos
+from apps.Modulo_Citas.Citas.models import Citas, DetalleCitas
 
 
-# Serializador para los detalles de las citas
+
+#Serializador para los detalles de las citas
 class DetalleCitasSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleCitas
-        fields = ['Diagnostico', 'Tratamiento']  # Solo estos campos para los detalles
+        fields = ['Diagnostico', 'Tratamiento']
 
-# Serializador para los datos completos de una cita
+#Serializador para los datos completos de una cita
 class CitasWithDetailsSerializer(serializers.ModelSerializer):
-    paciente = serializers.SerializerMethodField()  # Mostrar detalles del paciente
-    examen = serializers.SerializerMethodField()    # Mostrar detalles del examen
-    medicamento = serializers.SerializerMethodField()  # Mostrar detalles del medicamento
-    medicos = serializers.SerializerMethodField()   # Mostrar detalles del médico
-    DetalleCitas = DetalleCitasSerializer(many=True, read_only=True)  # Mostrar detalles relacionados
+    paciente = serializers.SerializerMethodField()
+    examen = serializers.SerializerMethodField()
+    medicamento = serializers.SerializerMethodField()
+    medicos = serializers.SerializerMethodField()
+    DetalleCitas = DetalleCitasSerializer(many=True, read_only=True)
 
     class Meta:
         model = Citas
-        fields = ['Num_citas', 'Fecha', 'Razon', 'Estado', 'Costo', 'paciente', 'examen', 'medicamento', 'medicos', 'DetalleCitas']
+        fields = ['Num_citas', 'Fecha', 'Razon', 'Estado', 'Costo', 'paciente','examen','medicamento','medicos', 'DetalleCitas']
 
     def get_paciente(self, obj):
         paciente = obj.paciente
@@ -44,7 +42,7 @@ class CitasWithDetailsSerializer(serializers.ModelSerializer):
             "Descripcion": examen.Descripcion,
         }
 
-    def get_medicamento(self, obj):
+    def get_medicamento (self, obj):
         medicamento = obj.medicamento
         return {
             "Nombre": medicamento.Nombre,
@@ -67,7 +65,7 @@ class CitasWithDetailsSerializer(serializers.ModelSerializer):
             "Telefono": medico.Telefono,
         }
 
-# Serializador para la creación de citas (acepta solo IDs y detalles)
+#Serializador para la creación de citas (acepta solo Id y detalles)
 class CitasCreateSerializer(serializers.ModelSerializer):
     paciente = serializers.IntegerField(write_only=True)  # Solo ID del paciente
     examen = serializers.IntegerField(write_only=True)    # Solo ID del examen
@@ -77,4 +75,4 @@ class CitasCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Citas
-        fields = ['Num_citas', 'Fecha', 'Razon', 'Estado', 'Costo', 'paciente', 'examen', 'medicamento', 'medicos', 'DetalleCitas']
+        fields = ['Num_citas', 'Fecha', 'Razon', 'Estado', 'Costo', 'paciente','examen','medicamento','medicos', 'DetalleCitas']

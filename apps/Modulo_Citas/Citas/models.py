@@ -12,7 +12,7 @@ class Citas(models.Model):
     Razon = models.CharField(verbose_name='Razon', max_length=50)
     Estado = models.CharField(verbose_name='Estado', max_length=50)
     Costo = models.CharField(verbose_name='Costo', max_length=50)
-    paciente = models.ForeignKey(Pacientes, related_name='Pacientes', on_delete=models.PROTECT)
+    paciente = models.ForeignKey(Pacientes, verbose_name='Pacientes', on_delete=models.PROTECT)
     examen = models.ForeignKey(Examen, verbose_name='Examen', on_delete=models.PROTECT)
     medicamento = models.ForeignKey(Medicamento,verbose_name='Medicamento', on_delete=models.PROTECT)
     medicos = models.ForeignKey(Medicos,verbose_name='Medicos', on_delete=models.PROTECT)

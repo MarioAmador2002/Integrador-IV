@@ -14,7 +14,7 @@ import logging.handlers
 # Configura el logger
 logger = logging.getLogger(__name__)
 
-class PacientesApiView(APIView):
+class PacientesApiView(PaginationMixin, APIView):
     """
     Vista para agregar, listar, actualizar y eliminar un paciente
     """
@@ -24,7 +24,7 @@ class PacientesApiView(APIView):
     @swagger_auto_schema(responses={200: PacientesSerializer(many=True)})
     def get(self, request):
         """
-        Listar todas los pacientes.
+        Listar todos los pacientes.
         """
         logger.info("GET request to list all pacientes")
         paciente = Pacientes.objects.all().order_by('id')
@@ -67,16 +67,14 @@ class PacienteDetails(APIView):
     """
     Vista para obtener, actualizar o eliminar un paciente específico.
     """
-
-
     permission_classes = [IsAuthenticated, CustomPermission]
     model = Pacientes
+
     @swagger_auto_schema(request_body=PacientesSerializer, responses={200: PacientesSerializer(many=True)})
     def put(self, request, pk):
         """
         Actualizar completamente un paciente por su ID.
         """
-
         logger.info("PUT request to update paciente with ID: %s", pk)
         paciente = get_object_or_404(Pacientes, id=pk)
         if not paciente:
@@ -89,16 +87,17 @@ class PacienteDetails(APIView):
             logger.info("paciente updated successfully with ID: %s", pk)
             return Response(serializer.data)
 
-            logger.error("Failed to update paciente with ID: %s. Errors: %s", pk, serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        logger.error("Failed to update paciente with ID: %s. Errors: %s", pk, serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        @swagger_auto_schema(request_body=PacientesSerializer, responses={200: PacientesSerializer(many=True)})
-        def patch(self, request, pk):
+    @swagger_auto_schema(request_body=PacientesSerializer, responses={200: PacientesSerializer(many=True)})
+    def patch(self, request, pk):
             """
             Actualizar parcialmente un paciente por su ID.
             """
             logger.info("PATCH request to partially update paciente with ID: %s", pk)
-            departamento = get_object_or_404(Pacientes, id=pk)
+            paciente = get_object_or_404(Pacientes, id=pk)
+
             if not paciente:
                 return Response({'error': 'paciente no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -112,8 +111,8 @@ class PacienteDetails(APIView):
             logger.error("Failed to partially update paciente with ID: %s. Errors: %s", pk, serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        @swagger_auto_schema(responses={204: 'No Content'})
-        def delete(self, request, pk):
+    @swagger_auto_schema(responses={204: 'No Content'})
+    def delete(self, request, pk):
             """
             Eliminar un paciente por su ID.
             """
@@ -126,5 +125,3 @@ class PacienteDetails(APIView):
             paciente.delete()
             logger.info("paciente deleted successfully with ID: %s", pk)
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-
